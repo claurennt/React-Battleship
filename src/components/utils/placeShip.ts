@@ -1,3 +1,5 @@
+import { getAllPossibleCoordinates } from './getAllPossibleCoordinates';
+
 type PlaceShipArgs = {
   rows: string[];
   columns: string[];
@@ -12,7 +14,7 @@ type CreatePositionArgs = {
   isVertical: boolean;
   availableCoordinates: string[];
   startingSquareIndex: number;
-  step: number;
+  squarePosition: number;
   gridSize?: number;
 };
 
@@ -20,12 +22,12 @@ const createPosition = ({
   isVertical,
   availableCoordinates,
   startingSquareIndex,
-  step,
+  squarePosition,
   gridSize = 10,
 }: CreatePositionArgs) =>
   isVertical
-    ? availableCoordinates[startingSquareIndex + step + gridSize] // Move down one full row (gridSize) per step for vertical placement
-    : availableCoordinates[startingSquareIndex + step]; // Move right per step for horizontal placement
+    ? availableCoordinates[startingSquareIndex + squarePosition * gridSize] // Move down one full row (gridSize) per step for vertical placement
+    : availableCoordinates[startingSquareIndex + squarePosition]; // Move right per step for horizontal placement
 
 type GetStartingSquareArgs = Pick<
   PlaceShipArgs,
@@ -44,10 +46,11 @@ const getStartingSquareIndex = ({
   const startRow = getRandomValue(rows, size);
   const startCol = getRandomValue(columns, size);
 
-  const startingSquare = `${startRow}${startCol}`;
+  const startingSquare = `${startCol}${startRow}`;
   const startingSquareIndex = availableCoordinates.findIndex(
     (coordinate) => coordinate === startingSquare
   );
+
   return startingSquareIndex;
 };
 
@@ -59,18 +62,11 @@ export const placeShip = ({
   count,
   size,
 }: PlaceShipArgs): Coordinates => {
-  const isVertical = Math.random() < 0.5;
-
-  // create array of all available coordinates
-  const availableCoordinates = rows.reduce<string[]>(
-    (acc, letter) => acc.concat(columns.map((number) => `${letter}${number}`)),
-    []
-  );
-
+  const availableCoordinates = getAllPossibleCoordinates({ rows, columns });
   const coordinates: Coordinates = [];
 
-  // number of ships
-  for (let i = 0; i < count; i++) {
+  const getValidShipCoordinates = (): string[] => {
+    const isVertical = Math.random() < 0.5;
     const startingSquareIndex = getStartingSquareIndex({
       rows,
       columns,
@@ -78,40 +74,30 @@ export const placeShip = ({
       availableCoordinates,
     });
 
-    let oneShipPositions: string[] = [];
+    const oneShipCoordinates: string[] = [];
 
-    // size of ship
-    for (let y = 0; y < size; y++) {
+    for (let squarePosition = 0; squarePosition < size; squarePosition++) {
       const position = createPosition({
         isVertical,
         availableCoordinates,
         startingSquareIndex,
-        step: y,
+        squarePosition,
       });
 
-      const isTaken = coordinates.some(([coordinate]) =>
-        coordinate.startsWith(position)
-      );
-
-      // coordinate already exists -- avoid duplicates
-      if (isTaken) {
-        const newStartingSquareIndex = getStartingSquareIndex({
-          rows,
-          columns,
-          size,
-          availableCoordinates,
-        });
-        const newPosition = createPosition({
-          isVertical,
-          availableCoordinates,
-          startingSquareIndex: newStartingSquareIndex,
-          step: y,
-        });
-        oneShipPositions.push(newPosition);
-      } else oneShipPositions.push(position);
+      oneShipCoordinates.push(position);
     }
 
-    coordinates.push(oneShipPositions);
+    const isOverlap = oneShipCoordinates.some((pos) =>
+      coordinates.flat().includes(pos)
+    );
+    if (isOverlap) return getValidShipCoordinates();
+
+    return oneShipCoordinates;
+  };
+
+  for (let i = 0; i < count; i++) {
+    const shipCoordinates = getValidShipCoordinates();
+    coordinates.push(shipCoordinates);
   }
 
   return coordinates;

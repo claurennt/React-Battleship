@@ -1,24 +1,13 @@
-import { useState, useEffect } from 'react';
-import { columns, rows } from '../utils';
 import './Battleground.css';
-import { placeShip, type Coordinates } from './utils/placeShip';
-import { ships } from '../ShipsInfo';
+import type { ComputerCoordinates } from '../../globalTypes';
+import { createGridValues } from '../utils';
 
-export const Battleground: React.FunctionComponent = () => {
-  const [shipsCoordinates, setShipsCoordinates] = useState<Coordinates>([]);
+export const Battleground: React.FunctionComponent<{
+  computerCordinates: ComputerCoordinates;
+}> = ({ computerCordinates }) => {
+  const columns = createGridValues({ type: 'column' }); // 1–10
+  const rows = createGridValues({ type: 'row' }); // A–J
 
-  useEffect(() => {
-    const allCoordinates: Coordinates = [];
-
-    ships.forEach(({ count, size }) => {
-      const shipGroup = placeShip({ rows, columns, count, size });
-
-      allCoordinates.push(...shipGroup); //flatten cordinates array
-    });
-
-    setShipsCoordinates(allCoordinates);
-  }, []);
-  console.log(shipsCoordinates.flat());
   return (
     <table className='battleground-table'>
       {/* hidden text for screen readers */}
@@ -40,11 +29,16 @@ export const Battleground: React.FunctionComponent = () => {
             <tr key={`row-${row}`}>
               <th scope='row'>{row}</th>
               {columns.map((col) => {
-                const cellName = `${col} ${row}`;
-                const cellState = 'not hit';
-                const cellInfo = `${cellName} ${cellState}`;
+                const cellName = `${col}${row}`;
+                const cellState = computerCordinates.find(
+                  ({ coordinate }) => coordinate === cellName
+                )?.hit;
+                const cellInfo = `${cellName} ${cellState?.toString()}`;
                 return (
-                  <td key={`cell-${col}-${row}`}>
+                  <td
+                    key={`cell-${col}-${row}`}
+                    className={cellState ? 'hit' : 'not-hit'}
+                  >
                     {/* hidden text for screen readers */}
                     <p className='sr-only'>{cellInfo}</p>
                   </td>
