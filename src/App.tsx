@@ -22,6 +22,11 @@ function App() {
     setComputerCoordinates(allCoordinates);
   }, []);
 
+  console.log(
+    'cheat mode 😆',
+    computerCoordinates.map(({ coordinate }) => coordinate)
+  );
+
   return (
     <>
       <header>
