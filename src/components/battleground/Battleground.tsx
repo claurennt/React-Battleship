@@ -33,13 +33,15 @@ export const Battleground: React.FunctionComponent<{
                 const cellState = computerCordinates.find(
                   ({ coordinate }) => coordinate === cellName
                 )?.hit;
-                const cellInfo = `${cellName} ${cellState?.toString()}`;
+                const cellInfo = `${cellName}, ${
+                  cellState ? 'hit' : 'not hit'
+                }`;
                 return (
                   <td
                     key={`cell-${col}-${row}`}
                     className={cellState ? 'hit' : 'not-hit'}
                   >
-                    {/* hidden text for screen readers */}
+                    {/* hidden text for screen reader users */}
                     <p className='sr-only'>{cellInfo}</p>
                   </td>
                 );
