@@ -1,0 +1,25 @@
+.battleground-table {
+  border-collapse: collapse;
+}
+.battleground-table th {
+  font-size: clamp(0.8rem, 5vw, 2rem);
+  padding: 4px;
+}
+
+.sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.battleground-table td:not(thead td) {
+  border: 1px solid #ffed00;
+  width: clamp(1rem, 8vw, 3rem);
+  height: clamp(1rem, 8vw, 3rem);
+  text-align: center;
+  vertical-align: middle;
+}
