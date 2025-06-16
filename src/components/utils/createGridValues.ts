@@ -1,7 +1,12 @@
-export const createGridValues = (
-  type: 'column' | 'row',
-  colHeaders: string = 'ABCDEFGHIJ'
-) => {
+type CreateGridValuesArgs = {
+  type: 'column' | 'row';
+  colHeaders?: string;
+};
+
+export const createGridValues = ({
+  type,
+  colHeaders = 'ABCDEFGHIJ',
+}: CreateGridValuesArgs) => {
   const getLabel = (i: number): string => {
     if (type === 'row') {
       return (i + 1).toString();
@@ -13,7 +18,3 @@ export const createGridValues = (
 
   return gridLabels;
 };
-const columns = createGridValues('column'); // 1–10
-const rows = createGridValues('row'); // A–J
-
-export { columns, rows };
