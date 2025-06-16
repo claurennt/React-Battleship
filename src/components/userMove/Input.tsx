@@ -34,6 +34,7 @@ export const Input: React.FunctionComponent<UserInputProps> = ({
           : coordinateObj
       )
     );
+    setUserInput('');
   };
   return (
     <div className='input'>
