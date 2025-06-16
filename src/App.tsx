@@ -29,7 +29,6 @@ function App() {
       </header>
       <main>
         <Input
-          computerCordinates={computerCoordinates}
           userInput={userInput}
           setUserInput={setUserInput}
           setComputerCoordinates={setComputerCoordinates}
