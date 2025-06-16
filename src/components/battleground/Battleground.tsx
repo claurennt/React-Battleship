@@ -1,7 +1,28 @@
+import { useState, useEffect } from 'react';
 import { columns, rows } from '../utils';
 import './Battleground.css';
+import { placeShip } from './utils/placeShip';
+import { ships } from '../ShipsInfo';
 
 export const Battleground: React.FunctionComponent = () => {
+  const [shipsCoordinates, setShipsCoordinates] = useState<
+    { coordinates: string[] }[]
+  >([]);
+
+  useEffect(() => {
+    ships.forEach(({ count, size }) => {
+      const shipCoordinates = placeShip({
+        rows,
+        columns,
+        count,
+        size,
+      });
+      setShipsCoordinates([{ coordinates: shipCoordinates }]);
+    });
+  }, []);
+
+  console.log(shipsCoordinates);
+
   return (
     <table className='battleground-table'>
       {/* hidden text for screen readers */}
