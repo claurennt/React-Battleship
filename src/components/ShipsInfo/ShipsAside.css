@@ -1,0 +1,9 @@
+.ship-square {
+  width: 20px;
+  height: 20px;
+  border: 1px solid yellow;
+}
+.ship {
+  padding: 10px;
+  display: flex;
+}
