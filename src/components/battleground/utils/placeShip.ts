@@ -5,8 +5,8 @@ type PlaceShipArgs = {
   size: number;
 };
 
-const getRandomValue = (array: string[]) =>
-  array[Math.floor(Math.random() * array.length)];
+const getRandomValue = (array: string[], size: number) =>
+  array[Math.floor(Math.random() * (array.length - size + 1))]; // stay within grid boundaries;
 
 export const placeShip = ({
   rows,
@@ -16,10 +16,6 @@ export const placeShip = ({
 }: PlaceShipArgs): string[] => {
   const isVertical = false;
 
-  //pick random starting column and row
-  const startRow = getRandomValue(rows);
-  const startCol = getRandomValue(columns);
-
   // create arry of all available coordinates
   const availableCoordinates = rows.reduce<string[]>(
     (acc, letter) => acc.concat(columns.map((number) => `${letter}${number}`)),
@@ -27,10 +23,14 @@ export const placeShip = ({
   );
 
   const coordinates = [];
-  const startingSquare = `${startRow}${startCol}`;
 
   // number of ships
   for (let i = 0; i < count; i++) {
+    //pick random starting column and row
+    const startRow = getRandomValue(rows, size);
+    const startCol = getRandomValue(columns, size);
+    const startingSquare = `${startRow}${startCol}`;
+
     // size of ship
     for (let y = 0; y < size; y++) {
       const picked = availableCoordinates.findIndex(
