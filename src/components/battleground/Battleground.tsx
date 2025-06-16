@@ -35,17 +35,24 @@ export const Battleground: React.FunctionComponent = () => {
         </tr>
       </thead>
       <tbody>
-        {rows.map((row) => (
-          <tr key={`row-${row}`}>
-            <th scope='row'>{row}</th>
-            {columns.map((col) => (
-              <td key={`cell-${col}-${row}`}>
-                {/* hidden text for screen readers */}
-                <p className='sr-only'>{`${col} ${row}`}</p>
-              </td>
-            ))}
-          </tr>
-        ))}
+        {rows.map((row) => {
+          return (
+            <tr key={`row-${row}`}>
+              <th scope='row'>{row}</th>
+              {columns.map((col) => {
+                const cellName = `${col} ${row}`;
+                const cellState = 'not hit';
+                const cellInfo = `${cellName} ${cellState}`;
+                return (
+                  <td key={`cell-${col}-${row}`}>
+                    {/* hidden text for screen readers */}
+                    <p className='sr-only'>{cellInfo}</p>
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );
