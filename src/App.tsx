@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { Battleground } from './components/battleground/Battleground';
-import { ShipsAside, ships } from './components/ShipsInfo';
-import { Input } from './components/userMove';
-import { placeShip } from './components/battleground/utils/placeShip';
-import { columns, rows } from './components/utils';
+import { Input, Battleground, ShipsAside, ships } from './components';
+import { placeShip, createGridValues } from './components/utils';
 import type { ComputerCoordinates } from './globalTypes';
 
 function App() {
   const [computerCoordinates, setComputerCoordinates] =
     useState<ComputerCoordinates>([]);
   const [userInput, setUserInput] = useState('');
+
+  const columns = createGridValues({ type: 'column' }); // 1–10
+  const rows = createGridValues({ type: 'row' }); // A–J
+
   useEffect(() => {
     const allCoordinates: ComputerCoordinates = ships
       .flatMap(({ count, size }) =>
