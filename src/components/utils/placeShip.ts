@@ -7,10 +7,13 @@ type PlaceShipArgs = {
   size: number;
 };
 
-const getRandomValue = (array: string[], size: number) =>
-  array[Math.floor(Math.random() * (array.length - size + 1))]; // stay within grid boundaries;
+const getRandomValue = (array: string[], size: number): string => {
+  const maxStartIndex = array.length - size;
+  const randomIndex = Math.floor(Math.random() * (maxStartIndex + 1)); // stay within grid boundaries;
+  return array[randomIndex];
+};
 
-type CreatePositionArgs = {
+type IsPositionValidArgs = {
   isVertical: boolean;
   availableCoordinates: string[];
   startingSquareIndex: number;
@@ -18,31 +21,50 @@ type CreatePositionArgs = {
   gridSize?: number;
 };
 
-const createPosition = ({
-  isVertical,
+const isPositionValid = ({
   availableCoordinates,
-  startingSquareIndex,
   squarePosition,
+  isVertical,
+  startingSquareIndex,
   gridSize = 10,
-}: CreatePositionArgs) =>
-  isVertical
-    ? availableCoordinates[startingSquareIndex + squarePosition * gridSize] // Move down one full row (gridSize) per step for vertical placement
-    : availableCoordinates[startingSquareIndex + squarePosition]; // Move right per step for horizontal placement
+}: IsPositionValidArgs): boolean => {
+  const offset = isVertical
+    ? squarePosition * gridSize //Vertical: offset by full rows (gridSize)
+    : squarePosition; // Horizontal: offset by 1 column;
 
-type GetStartingSquareArgs = Pick<
+  const currentSquareIndex = startingSquareIndex + offset;
+
+  // Check if the current square index is generally valid
+  const isValidPosition =
+    currentSquareIndex >= 0 && currentSquareIndex < availableCoordinates.length;
+
+  if (!isValidPosition) return false;
+
+  // Make sure the ship doesn't wrap to the next row
+  if (!isVertical) {
+    const startRow = Math.floor(startingSquareIndex / gridSize);
+    const endRow = Math.floor(currentSquareIndex / gridSize);
+
+    // If the starting row and current row are different, it's an invalid wrap
+    return startRow === endRow;
+  }
+
+  return true;
+};
+
+type GetRandomStartingSquareArgs = Pick<
   PlaceShipArgs,
   'rows' | 'columns' | 'size'
 > & {
   availableCoordinates: string[];
 };
 
-const getStartingSquareIndex = ({
+const getRandomStartingSquareIndex = ({
   rows,
   columns,
   size,
   availableCoordinates,
-}: GetStartingSquareArgs) => {
-  //pick random starting column and row
+}: GetRandomStartingSquareArgs): number => {
   const startRow = getRandomValue(rows, size);
   const startCol = getRandomValue(columns, size);
 
@@ -64,10 +86,12 @@ export const placeShip = ({
 }: PlaceShipArgs): Coordinates => {
   const availableCoordinates = getAllPossibleCoordinates({ rows, columns });
   const coordinates: Coordinates = [];
+  const gridSize = columns.length;
 
   const getValidShipCoordinates = (): string[] => {
     const isVertical = Math.random() < 0.5;
-    const startingSquareIndex = getStartingSquareIndex({
+
+    const startingSquareIndex = getRandomStartingSquareIndex({
       rows,
       columns,
       size,
@@ -76,13 +100,22 @@ export const placeShip = ({
 
     const oneShipCoordinates: string[] = [];
 
+    // number of squares per ship
     for (let squarePosition = 0; squarePosition < size; squarePosition++) {
-      const position = createPosition({
-        isVertical,
+      const isValid = isPositionValid({
         availableCoordinates,
-        startingSquareIndex,
         squarePosition,
+        isVertical,
+        startingSquareIndex,
+        gridSize,
       });
+
+      // retry ship placement creation
+      if (!isValid) return getValidShipCoordinates();
+
+      const offset = isVertical ? squarePosition * gridSize : squarePosition;
+
+      const position = availableCoordinates[startingSquareIndex + offset];
 
       oneShipCoordinates.push(position);
     }
@@ -90,11 +123,14 @@ export const placeShip = ({
     const isOverlap = oneShipCoordinates.some((pos) =>
       coordinates.flat().includes(pos)
     );
+
+    // retry ship placement creation
     if (isOverlap) return getValidShipCoordinates();
 
     return oneShipCoordinates;
   };
 
+  // number of ships
   for (let i = 0; i < count; i++) {
     const shipCoordinates = getValidShipCoordinates();
     coordinates.push(shipCoordinates);
