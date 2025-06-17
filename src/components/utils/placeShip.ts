@@ -25,19 +25,24 @@ const isPositionValid = ({
   startingSquareIndex,
   gridSize = 10,
 }: IsPositionValidArgs): boolean => {
-  const offset = isVertical ? squarePosition * gridSize : squarePosition;
+  const offset = isVertical
+    ? squarePosition * gridSize //Vertical: offset by full rows (gridSize)
+    : squarePosition; // Horizontal: offset by 1 column;
+
   const currentSquareIndex = startingSquareIndex + offset;
 
+  // Check if the current square index is generally valid
   const isValidPosition =
-    currentSquareIndex >= 0 &&
-    currentSquareIndex < availableCoordinates.length &&
-    !!availableCoordinates[currentSquareIndex];
+    currentSquareIndex >= 0 && currentSquareIndex < availableCoordinates.length;
 
   if (!isValidPosition) return false;
 
+  // Make sure the ship doesn't wrap to the next row
   if (!isVertical) {
     const startRow = Math.floor(startingSquareIndex / gridSize);
     const endRow = Math.floor(currentSquareIndex / gridSize);
+
+    // If the starting row and current row are different, it's an invalid wrap
     return startRow === endRow;
   }
 
@@ -92,6 +97,7 @@ export const placeShip = ({
 
     const oneShipCoordinates: string[] = [];
 
+    // number of squares per ship
     for (let squarePosition = 0; squarePosition < size; squarePosition++) {
       const isValid = isPositionValid({
         availableCoordinates,
@@ -100,6 +106,8 @@ export const placeShip = ({
         startingSquareIndex,
         gridSize,
       });
+
+      // retry ship placement creation
       if (!isValid) return getValidShipCoordinates();
 
       const offset = isVertical ? squarePosition * gridSize : squarePosition;
@@ -113,11 +121,13 @@ export const placeShip = ({
       coordinates.flat().includes(pos)
     );
 
-    if (isOverlap) return getValidShipCoordinates(); // retry recursively
+    // retry ship placement creation
+    if (isOverlap) return getValidShipCoordinates();
 
     return oneShipCoordinates;
   };
 
+  // number of ships
   for (let i = 0; i < count; i++) {
     const shipCoordinates = getValidShipCoordinates();
     coordinates.push(shipCoordinates);
