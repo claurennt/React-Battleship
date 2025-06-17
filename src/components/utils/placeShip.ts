@@ -7,8 +7,11 @@ type PlaceShipArgs = {
   size: number;
 };
 
-const getRandomValue = (array: string[], size: number) =>
-  array[Math.floor(Math.random() * (array.length - size + 1))]; // stay within grid boundaries;
+const getRandomValue = (array: string[], size: number): string => {
+  const maxStartIndex = array.length - size;
+  const randomIndex = Math.floor(Math.random() * (maxStartIndex + 1)); // stay within grid boundaries;
+  return array[randomIndex];
+};
 
 type IsPositionValidArgs = {
   isVertical: boolean;
