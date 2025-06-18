@@ -6,11 +6,12 @@ import {
   createGridValues,
 } from './components/utils';
 import type { ComputerCoordinates } from './globalTypes';
+import { ComputerShip } from './components/shipsInfo/shipsData';
 
 const columns = createGridValues('column'); // 1–10
 const rows = createGridValues('row'); // A–J
 const allCoordinates: ComputerCoordinates = ships
-  .flatMap(({ count, size }) => {
+  .flatMap(({ count, size }: ComputerShip) => {
     const coordinates = createComputerCoordinates({
       rows,
       columns,
