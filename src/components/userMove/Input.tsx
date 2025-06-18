@@ -40,13 +40,13 @@ export const Input = ({
     <section className='input'>
       <h2>Enter Attack Coordinates</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor='coords'>Coordinates - example: 'A1'</label>
+        <label htmlFor='coords'>Coordinates - example: A1</label>
         <input
           id='coords'
           value={userInput}
           onChange={(e) => setUserInput(e.target.value.toUpperCase())}
           placeholder='A1'
-          maxLength={2}
+          maxLength={3}
         />
       </form>
     </section>
