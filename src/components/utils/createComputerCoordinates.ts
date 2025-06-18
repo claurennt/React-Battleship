@@ -1,11 +1,5 @@
 import { getAllPossibleCoordinates } from './getAllPossibleCoordinates';
 
-const getRandomValue = (array: string[], size: number): string => {
-  const maxStartIndex = array.length - size;
-  const randomIndex = Math.floor(Math.random() * (maxStartIndex + 1)); // stay within grid boundaries;
-  return array[randomIndex];
-};
-
 const isWithinSameRow = (
   startingSquareIndex: number,
   currentSquareIndex: number,
@@ -51,29 +45,8 @@ const isPositionValid = ({
   return true;
 };
 
-type GetRandomStartingSquareArgs = Pick<
-  CreateComputerCoordinatesArgs,
-  'rows' | 'columns' | 'size'
-> & {
-  availableCoordinates: string[];
-};
-
-const getRandomStartingSquareIndex = ({
-  rows,
-  columns,
-  size,
-  availableCoordinates,
-}: GetRandomStartingSquareArgs): number => {
-  const startRow = getRandomValue(rows, size);
-  const startColumn = getRandomValue(columns, size);
-
-  const startingSquare = `${startColumn}${startRow}`;
-  const startingSquareIndex = availableCoordinates.findIndex(
-    (coordinate) => coordinate === startingSquare
-  );
-
-  return startingSquareIndex;
-};
+const getRandomStartingSquareIndex = (availableCoordinates: string[]): number =>
+  Math.floor(Math.random() * availableCoordinates.length);
 
 type Coordinates = string[][];
 
@@ -101,12 +74,8 @@ export const createComputerCoordinates = ({
 
     const isVertical = Math.random() < 0.5;
 
-    const startingSquareIndex = getRandomStartingSquareIndex({
-      rows,
-      columns,
-      size,
-      availableCoordinates,
-    });
+    const startingSquareIndex =
+      getRandomStartingSquareIndex(availableCoordinates);
 
     const oneShipCoordinates: string[] = [];
 

@@ -1,5 +1,4 @@
 import './Battleground.css';
-import type { ComputerCoordinates } from '../../globalTypes';
 import { createGridValues } from '../utils';
 
 const columns = createGridValues('column'); // A–J
@@ -8,32 +7,42 @@ const rows = createGridValues('row'); // 1–10
 type RenderTableDataCellsArgs = {
   column: string;
   row: string;
-  computerCoordinates: ComputerCoordinates;
+  hits: string[];
+  misses: string[];
 };
+
+const getCellState = (coordinate: string, hits: string[], misses: string[]) => {
+  if (hits.includes(coordinate)) return 'hit';
+  if (misses.includes(coordinate)) return 'missed';
+  return 'untargeted';
+};
+
 const renderTableDataCells = ({
   column,
   row,
-  computerCoordinates,
+  hits,
+  misses,
 }: RenderTableDataCellsArgs) => {
-  const cellName = `${column}${row}`;
-  const isHit = computerCoordinates.find(
-    ({ coordinate }) => coordinate === cellName
-  )?.hit;
-  const cellState = isHit ? 'hit' : 'not-hit';
-  const cellInfo = `${cellName}, ${cellState}`;
+  const coordinate = `${column}${row}`;
+  const state = getCellState(coordinate, hits, misses);
+  const cellContent = `${coordinate} ${
+    state === 'hit' ? 'hit' : state === 'missed' ? 'missed' : 'untargeted'
+  }`;
   return (
-    <td key={`cell-${column}-${row}`} className={cellState}>
-      {/* hidden text for screen reader users */}
-      <p className='sr-only'>{cellInfo}</p>
+    <td key={`cell-${column}-${row}`} className={state}>
+      {/* Show X for misses */}
+      {state === 'missed' && <span aria-hidden='true'>X</span>}
+      <p className='sr-only'>{cellContent}</p>
     </td>
   );
 };
 
 type BattlegroundProps = {
-  computerCoordinates: ComputerCoordinates;
+  hits: string[];
+  misses: string[];
 };
 
-export const Battleground = ({ computerCoordinates }: BattlegroundProps) => (
+export const Battleground = ({ hits, misses }: BattlegroundProps) => (
   <table className='battleground-table'>
     {/* hidden text for screen readers */}
     <caption className='sr-only'>Battleground</caption>
@@ -53,7 +62,7 @@ export const Battleground = ({ computerCoordinates }: BattlegroundProps) => (
         <tr key={`row-${row}`}>
           <th scope='row'>{row}</th>
           {columns.map((column) =>
-            renderTableDataCells({ column, row, computerCoordinates })
+            renderTableDataCells({ row, column, hits, misses })
           )}
         </tr>
       ))}
