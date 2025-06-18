@@ -5,44 +5,38 @@ import {
   createComputerCoordinates,
   createGridValues,
 } from './components/utils';
-import type { ComputerCoordinates } from './globalTypes';
 import type { ComputerShip } from './components/';
 
 const columns = createGridValues('column'); // 1–10
 const rows = createGridValues('row'); // A–J
-const allCoordinates: ComputerCoordinates = ships
-  .flatMap(({ count, size }: ComputerShip) => {
-    const coordinates = createComputerCoordinates({
-      rows,
-      columns,
-      count,
-      size,
-    });
-    return coordinates;
-  })
-  .map((coordinate: string) => ({ coordinate, hit: false }));
+const computerCoordinates = ships.flatMap(({ count, size }: ComputerShip) => {
+  const coordinates = createComputerCoordinates({
+    rows,
+    columns,
+    count,
+    size,
+  });
+  return coordinates;
+});
 
 const App = () => {
-  const [computerCoordinates, setComputerCoordinates] =
-    useState<ComputerCoordinates>(allCoordinates);
-  const [userInput, setUserInput] = useState<string>('');
-  const [endGame, setEndGame] = useState<boolean>(false);
+  const [hits, setHits] = useState<string[]>([]);
+  const [misses, setMisses] = useState<string[]>([]);
 
   useEffect(() => {
-    const allShipsSunk = computerCoordinates.every(
-      (coordinate) => coordinate.hit === true
-    );
-
-    if (allShipsSunk && !endGame) {
-      setEndGame(true);
-      alert('Congratulations! You sunk all the battleships! 🎉');
+    if (hits.length === computerCoordinates.length) {
+      alert('You won! 🎉');
     }
-  }, [computerCoordinates, endGame]);
+  }, [hits]);
 
-  console.log(
-    'cheat mode 😆',
-    computerCoordinates.map(({ coordinate }) => coordinate)
-  );
+  const fireShot = (coordinate: string) => {
+    if (hits.includes(coordinate) || misses.includes(coordinate)) return;
+
+    computerCoordinates.includes(coordinate)
+      ? setHits([...hits, coordinate])
+      : setMisses([...misses, coordinate]);
+  };
+  console.log('cheat mode 😆', computerCoordinates);
 
   return (
     <>
@@ -50,12 +44,8 @@ const App = () => {
         <h1>React Battleship</h1>
       </header>
       <main>
-        <Input
-          userInput={userInput}
-          setUserInput={setUserInput}
-          setComputerCoordinates={setComputerCoordinates}
-        />
-        <Battleground computerCoordinates={computerCoordinates} />
+        <Input fireShot={fireShot} />
+        <Battleground hits={hits} misses={misses} />
         <ShipsInfo ships={ships} />
       </main>
     </>
