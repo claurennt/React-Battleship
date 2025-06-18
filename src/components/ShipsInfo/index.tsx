@@ -1,2 +1,2 @@
-export { ShipsAside } from './ShipsAside';
-export { type ComputerShip, ships } from './shipsData';
+export { ShipsInfo } from './ShipsInfo';
+export { ships } from './shipsData';
