@@ -1,16 +1,20 @@
 import { getAllPossibleCoordinates } from './getAllPossibleCoordinates';
 
-type PlaceShipArgs = {
-  rows: string[];
-  columns: string[];
-  count: number;
-  size: number;
-};
-
 const getRandomValue = (array: string[], size: number): string => {
   const maxStartIndex = array.length - size;
   const randomIndex = Math.floor(Math.random() * (maxStartIndex + 1)); // stay within grid boundaries;
   return array[randomIndex];
+};
+
+const isWithinSameRow = (
+  startingSquareIndex: number,
+  currentSquareIndex: number,
+  gridSize: number
+): boolean => {
+  const startRow = Math.floor(startingSquareIndex / gridSize);
+  const endRow = Math.floor(currentSquareIndex / gridSize);
+  // If the starting row and current row are different, it's an invalid wrap
+  return startRow === endRow;
 };
 
 type IsPositionValidArgs = {
@@ -40,20 +44,15 @@ const isPositionValid = ({
 
   if (!isValidPosition) return false;
 
-  // Make sure the ship doesn't wrap to the next row
   if (!isVertical) {
-    const startRow = Math.floor(startingSquareIndex / gridSize);
-    const endRow = Math.floor(currentSquareIndex / gridSize);
-
-    // If the starting row and current row are different, it's an invalid wrap
-    return startRow === endRow;
+    return isWithinSameRow(startingSquareIndex, currentSquareIndex, gridSize);
   }
 
   return true;
 };
 
 type GetRandomStartingSquareArgs = Pick<
-  PlaceShipArgs,
+  CreateComputerCoordinatesArgs,
   'rows' | 'columns' | 'size'
 > & {
   availableCoordinates: string[];
@@ -66,9 +65,9 @@ const getRandomStartingSquareIndex = ({
   availableCoordinates,
 }: GetRandomStartingSquareArgs): number => {
   const startRow = getRandomValue(rows, size);
-  const startCol = getRandomValue(columns, size);
+  const startColumn = getRandomValue(columns, size);
 
-  const startingSquare = `${startCol}${startRow}`;
+  const startingSquare = `${startColumn}${startRow}`;
   const startingSquareIndex = availableCoordinates.findIndex(
     (coordinate) => coordinate === startingSquare
   );
@@ -76,19 +75,30 @@ const getRandomStartingSquareIndex = ({
   return startingSquareIndex;
 };
 
-export type Coordinates = string[][];
+type Coordinates = string[][];
 
-export const placeShip = ({
+type CreateComputerCoordinatesArgs = {
+  rows: string[];
+  columns: string[];
+  count: number;
+  size: number;
+};
+
+export const createComputerCoordinates = ({
   rows,
   columns,
   count,
   size,
-}: PlaceShipArgs): Coordinates => {
+}: CreateComputerCoordinatesArgs): Coordinates => {
   const availableCoordinates = getAllPossibleCoordinates({ rows, columns });
   const coordinates: Coordinates = [];
   const gridSize = columns.length;
 
-  const getValidShipCoordinates = (): string[] => {
+  const getValidShipCoordinates = (attempts = 0): string[] => {
+    if (attempts > 30) {
+      throw new Error('Unable to place ship - too many attempts');
+    }
+
     const isVertical = Math.random() < 0.5;
 
     const startingSquareIndex = getRandomStartingSquareIndex({
@@ -111,7 +121,7 @@ export const placeShip = ({
       });
 
       // retry ship placement creation
-      if (!isValid) return getValidShipCoordinates();
+      if (!isValid) return getValidShipCoordinates(attempts + 1);
 
       const offset = isVertical ? squarePosition * gridSize : squarePosition;
 
@@ -125,7 +135,7 @@ export const placeShip = ({
     );
 
     // retry ship placement creation
-    if (isOverlap) return getValidShipCoordinates();
+    if (isOverlap) return getValidShipCoordinates(attempts + 1);
 
     return oneShipCoordinates;
   };

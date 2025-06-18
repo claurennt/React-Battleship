@@ -1,3 +1,3 @@
-export { placeShip } from './placeShip';
+export { createComputerCoordinates } from './createComputerCoordinates';
 export { createGridValues } from './createGridValues';
 export { getAllPossibleCoordinates } from './getAllPossibleCoordinates';
