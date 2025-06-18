@@ -10,9 +10,15 @@ import type { ComputerCoordinates } from './globalTypes';
 const columns = createGridValues('column'); // 1–10
 const rows = createGridValues('row'); // A–J
 const allCoordinates: ComputerCoordinates = ships
-  .flatMap(({ count, size }) =>
-    createComputerCoordinates({ rows, columns, count, size }).flat()
-  )
+  .flatMap(({ count, size }) => {
+    const coordinates = createComputerCoordinates({
+      rows,
+      columns,
+      count,
+      size,
+    });
+    return coordinates;
+  })
   .map((coordinate) => ({ coordinate, hit: false }));
 
 const App = () => {

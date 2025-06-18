@@ -89,7 +89,7 @@ export const createComputerCoordinates = ({
   columns,
   count,
   size,
-}: CreateComputerCoordinatesArgs): Coordinates => {
+}: CreateComputerCoordinatesArgs): string[] => {
   const availableCoordinates = getAllPossibleCoordinates({ rows, columns });
   const coordinates: Coordinates = [];
   const gridSize = columns.length;
@@ -146,5 +146,5 @@ export const createComputerCoordinates = ({
     coordinates.push(shipCoordinates);
   }
 
-  return coordinates;
+  return coordinates.flat();
 };
