@@ -1,20 +1,17 @@
-type CreateGridValuesArgs = {
-  type: 'column' | 'row';
-  colHeaders?: string;
-};
-
-export const createGridValues = ({
-  type,
-  colHeaders = 'ABCDEFGHIJ',
-}: CreateGridValuesArgs) => {
+export const createGridValues = (
+  type: 'column' | 'row',
+  columnHeaders: string = 'ABCDEFGHIJ'
+) => {
   const getLabel = (i: number): string => {
     if (type === 'row') {
       return (i + 1).toString();
     }
-    return colHeaders[i];
+    return columnHeaders[i];
   };
 
-  const gridLabels = Array.from({ length: 10 }, (_, i) => getLabel(i));
+  const gridLabels = Array.from({ length: columnHeaders.length }, (_, i) =>
+    getLabel(i)
+  );
 
   return gridLabels;
 };
