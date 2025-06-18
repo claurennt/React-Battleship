@@ -11,19 +11,19 @@ type UserInputProps = {
   setUserInput: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const rows = createGridValues({ type: 'row' });
-const columns = createGridValues({ type: 'column' });
+const rows = createGridValues('row');
+const columns = createGridValues('column');
 const allCoordinates = getAllPossibleCoordinates({ rows, columns });
 
-export const Input: React.FunctionComponent<UserInputProps> = ({
+export const Input = ({
   setComputerCoordinates,
   userInput,
   setUserInput,
-}) => {
+}: UserInputProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // basic validation, do othing if input is not valid
+    // basic validation, do nothing if input is not valid
     const isValid = validateUserInput(allCoordinates, userInput);
     if (!isValid) return;
 
@@ -37,18 +37,18 @@ export const Input: React.FunctionComponent<UserInputProps> = ({
     setUserInput('');
   };
   return (
-    <div className='input'>
-      <h3>Enter Attack Coordinates</h3>
+    <section className='input'>
+      <h2>Enter Attack Coordinates</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor='coords'>Coordinates</label>
+        <label htmlFor='coords'>Coordinates - example: A1</label>
         <input
           id='coords'
           value={userInput}
           onChange={(e) => setUserInput(e.target.value.toUpperCase())}
           placeholder='A1'
-          maxLength={2}
+          maxLength={3}
         />
       </form>
-    </div>
+    </section>
   );
 };
