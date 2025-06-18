@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { Input, Battleground, ShipsInfo, ships } from './components';
 import {
@@ -26,6 +26,18 @@ const App = () => {
   const [computerCoordinates, setComputerCoordinates] =
     useState<ComputerCoordinates>(allCoordinates);
   const [userInput, setUserInput] = useState<string>('');
+  const [endGame, setEndGame] = useState<boolean>(false);
+
+  useEffect(() => {
+    const allShipsSunk = computerCoordinates.every(
+      (coordinate) => coordinate.hit === true
+    );
+
+    if (allShipsSunk && !endGame) {
+      setEndGame(true);
+      alert('Congratulations! You sunk all the battleships! 🎉');
+    }
+  }, [computerCoordinates, endGame]);
 
   console.log(
     'cheat mode 😆',

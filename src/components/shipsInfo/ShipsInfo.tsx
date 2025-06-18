@@ -1,5 +1,5 @@
 import type { ComputerShip } from './shipsData';
-import './ShipsAside.css'; // CSS Modules
+import './ShipsAside.css';
 
 const renderShipSquares = (size: number) =>
   Array.from({ length: size }, (_, squareIndex) => (
