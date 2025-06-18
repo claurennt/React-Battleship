@@ -1,3 +1,3 @@
 export { Battleground } from './battleground';
 export { Input } from './userMove';
-export { ShipsInfo, ships } from './shipsInfo';
+export { ShipsInfo, ships, type ComputerShip } from './shipsInfo';

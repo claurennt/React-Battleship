@@ -6,7 +6,7 @@ import {
   createGridValues,
 } from './components/utils';
 import type { ComputerCoordinates } from './globalTypes';
-import { ComputerShip } from './components/shipsInfo/shipsData';
+import type { ComputerShip } from './components/';
 
 const columns = createGridValues('column'); // 1–10
 const rows = createGridValues('row'); // A–J
@@ -20,7 +20,7 @@ const allCoordinates: ComputerCoordinates = ships
     });
     return coordinates;
   })
-  .map((coordinate) => ({ coordinate, hit: false }));
+  .map((coordinate: string) => ({ coordinate, hit: false }));
 
 const App = () => {
   const [computerCoordinates, setComputerCoordinates] =
